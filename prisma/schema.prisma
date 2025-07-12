@@ -27,6 +27,7 @@ model User {
   profileCompleted  Boolean             @default(false)
   bio               String?
   timezone          String?
+  availabilityData  String?             // JSON string for availability data
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
 
