@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 export async function GET() {
   try {
     const session = await getServerSession();
-    
+
     if (!session?.user?.email) {
       return NextResponse.json(
         { message: "Unauthorized" },
@@ -30,7 +30,7 @@ export async function GET() {
     // Try to get availability data
     let availability = null;
     let availabilityError = null;
-    
+
     try {
       const availabilityModel = (prisma as any).userAvailability;
       if (availabilityModel) {
@@ -73,7 +73,7 @@ export async function GET() {
   } catch (error) {
     console.error("Debug availability error:", error);
     return NextResponse.json(
-      { 
+      {
         message: "Internal server error",
         error: error instanceof Error ? error.message : "Unknown error"
       },

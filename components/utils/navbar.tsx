@@ -3,6 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useSession } from "next-auth/react"
+import { Button } from "@/components/ui/button"
 import { AuthStatus } from "@/app/components/auth-status"
 
 export function Navbar() {
@@ -31,38 +32,23 @@ export function Navbar() {
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/"
-              className="text-gray-600 hover:text-sky-600 transition-colors font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              href="/search"
-              className="text-gray-600 hover:text-sky-600 transition-colors font-medium"
-            >
-              Search Skills
-            </Link>
-            <Link
-              href="/profile"
-              className="text-gray-600 hover:text-sky-600 transition-colors font-medium"
-            >
-              My Profile
-            </Link>
-            <Link
-              href="/requests"
-              className="text-gray-600 hover:text-sky-600 transition-colors font-medium"
-            >
-              Requests
-            </Link>
+          <div className="hidden md:flex items-center gap-2">
+            <Button variant="ghost" asChild>
+              <Link href="/">Home</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/search">Search Skills</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/profile">My Profile</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/requests">Requests</Link>
+            </Button>
             {isAdmin && (
-              <Link
-                href="/admin"
-                className="text-gray-600 hover:text-sky-600 transition-colors font-medium"
-              >
-                Admin
-              </Link>
+              <Button variant="ghost" asChild>
+                <Link href="/admin">Admin</Link>
+              </Button>
             )}
           </div>
 

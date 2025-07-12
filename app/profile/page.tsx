@@ -5,15 +5,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ReviewsList } from "@/components/reviews/reviews-list";
-import { 
-  User, 
-  Edit, 
-  MapPin, 
-  Clock, 
-  Eye, 
-  EyeOff, 
-  Star, 
+import {
+  User,
+  Edit,
+  MapPin,
+  Clock,
+  Eye,
+  EyeOff,
+  Star,
   Calendar,
   CheckCircle,
   AlertCircle
@@ -141,12 +144,11 @@ export default function ProfilePage() {
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Profile</h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <Link
-            href="/profile/setup"
-            className="inline-flex items-center px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
-          >
-            Complete Profile Setup
-          </Link>
+          <Button asChild>
+            <Link href="/profile/setup">
+              Complete Profile Setup
+            </Link>
+          </Button>
         </div>
       </div>
     );
@@ -159,12 +161,11 @@ export default function ProfilePage() {
           <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile Not Found</h2>
           <p className="text-gray-600 mb-4">It looks like you haven&rsquo;t completed your profile setup yet.</p>
-          <Link
-            href="/profile/setup"
-            className="inline-flex items-center px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
-          >
-            Complete Profile Setup
-          </Link>
+          <Button asChild>
+            <Link href="/profile/setup">
+              Complete Profile Setup
+            </Link>
+          </Button>
         </div>
       </div>
     );
@@ -189,7 +190,8 @@ export default function ProfilePage() {
 
         <div className="max-w-4xl mx-auto">
           {/* Profile Header */}
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+          <Card className="mb-8">
+            <CardContent className="p-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-6 mb-6 md:mb-0">
                 <div className="w-20 h-20 bg-sky-100 rounded-full flex items-center justify-center overflow-hidden">
@@ -233,13 +235,12 @@ export default function ProfilePage() {
                 </div>
               </div>
               
-              <Link
-                href="/profile/edit"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
-              >
-                <Edit className="w-4 h-4" />
-                Edit Profile
-              </Link>
+              <Button asChild>
+                <Link href="/profile/edit">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </Link>
+              </Button>
             </div>
 
             {profile.bio && (
@@ -248,53 +249,64 @@ export default function ProfilePage() {
                 <p className="text-gray-600 leading-relaxed">{profile.bio}</p>
               </div>
             )}
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Skills Section */}
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             {/* Skills Offered */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Star className="w-5 h-5 text-green-600" />
-                Skills I Can Teach
-              </h2>
-              {profile.skillsOffered.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {profile.skillsOffered.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 italic">No skills added yet</p>
-              )}
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-green-600" />
+                  Skills I Can Teach
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {profile.skillsOffered.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {profile.skillsOffered.map((skill) => (
+                      <Badge
+                        key={skill}
+                        variant="secondary"
+                        className="bg-green-100 text-green-700 hover:bg-green-200"
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">No skills added yet</p>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Skills Wanted */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Star className="w-5 h-5 text-blue-600" />
-                Skills I Want to Learn
-              </h2>
-              {profile.skillsWanted.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {profile.skillsWanted.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 italic">No skills added yet</p>
-              )}
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-blue-600" />
+                  Skills I Want to Learn
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {profile.skillsWanted.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {profile.skillsWanted.map((skill) => (
+                      <Badge
+                        key={skill}
+                        variant="secondary"
+                        className="bg-blue-100 text-blue-700 hover:bg-blue-200"
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">No skills added yet</p>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Availability & Settings */}

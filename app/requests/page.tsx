@@ -21,6 +21,10 @@ import {
   Star,
   Video
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { MessageThread } from "@/components/messaging/message-thread";
 import { ScheduleMeeting } from "@/components/scheduling/schedule-meeting";
