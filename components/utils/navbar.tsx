@@ -2,9 +2,18 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 import { AuthStatus } from "@/app/components/auth-status"
 
 export function Navbar() {
+  const { data: session } = useSession()
+
+  // Check if user is admin
+  const isAdmin = session?.user?.email && [
+    "admin@skillswap.com",
+    "bhosvivek123@gmail.com"
+  ].includes(session.user.email)
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -41,6 +50,20 @@ export function Navbar() {
             >
               My Profile
             </Link>
+            <Link
+              href="/requests"
+              className="text-gray-600 hover:text-sky-600 transition-colors font-medium"
+            >
+              Requests
+            </Link>
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="text-gray-600 hover:text-sky-600 transition-colors font-medium"
+              >
+                Admin
+              </Link>
+            )}
           </div>
 
           {/* Auth Status */}

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
+import { ReviewsList } from "@/components/reviews/reviews-list";
 import { 
   User, 
   Edit, 
@@ -341,6 +342,18 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        {profile && (
+          <div className="mt-8">
+            <ReviewsList
+              userId={profile.id}
+              type="received"
+              showHeader={true}
+              limit={5}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
