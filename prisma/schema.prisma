@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  name              String?
+  email             String              @unique
+  password          String?
+  image             String?
+  location          String?
+  skillsOffered     String[]
+  skillsWanted      String[]
+  availability      UserAvailability?
+  profileVisibility ProfileVisibility   @default(PUBLIC)
+  profileCompleted  Boolean             @default(false)
+  bio               String?
+  timezone          String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  // Relations for future features
+  sentRequests      SwapRequest[]       @relation("RequestSender")
+  receivedRequests  SwapRequest[]       @relation("RequestReceiver")
+  givenReviews      Review[]            @relation("ReviewGiver")
+  receivedReviews   Review[]            @relation("ReviewReceiver")
+}
+
+model UserAvailability {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @unique @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekdays    Boolean  @default(false)
+  weekends    Boolean  @default(false)
+  mornings    Boolean  @default(false)
+  afternoons  Boolean  @default(false)
+  evenings    Boolean  @default(false)
+  flexible    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SwapRequest {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  senderId    String            @db.ObjectId
+  receiverId  String            @db.ObjectId
+  sender      User              @relation("RequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User              @relation("RequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  status      SwapRequestStatus @default(PENDING)
+  message     String?
+  skillOffered String
+  skillWanted  String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model Review {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  giverId    String   @db.ObjectId
+  receiverId String   @db.ObjectId
+  giver      User     @relation("ReviewGiver", fields: [giverId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ReviewReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  rating     Int      // 1-5 stars
+  comment    String?
+  swapId     String?  // Reference to the swap this review is for
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum ProfileVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum SwapRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
