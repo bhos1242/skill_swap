@@ -16,77 +16,67 @@ export default function ProfileEditPage() {
   const [initialData, setInitialData] = useState<Partial<ProfileSetupFormData> | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
-  // Redirect to sign-in if not authenticated
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === "unauthenticated") {
-    router.push("/sign-in");
-    return null;
-  }
-
   // Fetch current profile data
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setIsLoadingProfile(true);
-        const response = await fetch("/api/profile/setup");
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile");
+    if (status === "authenticated") {
+      const fetchProfile = async () => {
+        try {
+          setIsLoadingProfile(true);
+          const response = await fetch("/api/profile/setup");
+          
+          if (!response.ok) {
+            throw new Error("Failed to fetch profile");
+          }
+
+          const data = await response.json();
+          const user = data.user;
+
+          // Transform the data to match ProfileSetupFormData structure
+          console.log("User data received:", user); // Debug log
+          console.log("Availability data:", user.availability); // Debug log
+
+          setInitialData({
+            name: user.name || "",
+            location: user.location || "",
+            skillsOffered: user.skillsOffered || [],
+            skillsWanted: user.skillsWanted || [],
+            availability: user.availability ? {
+              weekdays: Boolean(user.availability.weekdays),
+              weekends: Boolean(user.availability.weekends),
+              mornings: Boolean(user.availability.mornings),
+              afternoons: Boolean(user.availability.afternoons),
+              evenings: Boolean(user.availability.evenings),
+              flexible: Boolean(user.availability.flexible)
+            } : {
+              weekdays: false,
+              weekends: false,
+              mornings: false,
+              afternoons: false,
+              evenings: false,
+              flexible: false
+            },
+            profileVisibility: user.profileVisibility || "PUBLIC",
+            bio: user.bio || "",
+            timezone: user.timezone || "America/New_York"
+          });
+        } catch (err) {
+          console.error("Profile fetch error:", err);
+          setError(err instanceof Error ? err.message : "Failed to load profile");
+        } finally {
+          setIsLoadingProfile(false);
         }
+      };
 
-        const data = await response.json();
-        const user = data.user;
-
-        // Transform the data to match ProfileSetupFormData structure
-        console.log("User data received:", user); // Debug log
-        console.log("Availability data:", user.availability); // Debug log
-
-        setInitialData({
-          name: user.name || "",
-          location: user.location || "",
-          skillsOffered: user.skillsOffered || [],
-          skillsWanted: user.skillsWanted || [],
-          availability: user.availability ? {
-            weekdays: Boolean(user.availability.weekdays),
-            weekends: Boolean(user.availability.weekends),
-            mornings: Boolean(user.availability.mornings),
-            afternoons: Boolean(user.availability.afternoons),
-            evenings: Boolean(user.availability.evenings),
-            flexible: Boolean(user.availability.flexible)
-          } : {
-            weekdays: false,
-            weekends: false,
-            mornings: false,
-            afternoons: false,
-            evenings: false,
-            flexible: false
-          },
-          profileVisibility: user.profileVisibility || "PUBLIC",
-          bio: user.bio || "",
-          timezone: user.timezone || "America/New_York"
-        });
-      } catch (err) {
-        console.error("Profile fetch error:", err);
-        setError(err instanceof Error ? err.message : "Failed to load profile");
-      } finally {
-        setIsLoadingProfile(false);
-      }
-    };
-
-    if (session?.user?.email) {
       fetchProfile();
     }
-  }, [session]);
+  }, [status]);
+
+  // Redirect to sign-in if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/sign-in");
+    }
+  }, [status, router]);
 
   const handleProfileUpdate = async (formData: ProfileSetupFormData) => {
     setIsLoading(true);
@@ -116,7 +106,20 @@ export default function ProfileEditPage() {
     }
   };
 
-  if (isLoadingProfile) {
+  // Show loading state
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state for profile data
+  if (status === "authenticated" && isLoadingProfile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">

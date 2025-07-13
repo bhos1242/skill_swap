@@ -33,7 +33,7 @@ import {
   TrendingUp,
   Search,
   Shield,
-  AlertTriangle,
+
   Ban,
   CheckCircle,
   Trash2,
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+
   const [actionDialog, setActionDialog] = useState<{
     open: boolean;
     action: "suspend" | "unsuspend" | "delete" | null;

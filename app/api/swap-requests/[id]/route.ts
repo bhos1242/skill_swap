@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // GET - Fetch a specific swap request
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession();
@@ -19,7 +19,7 @@ export async function GET(
       );
     }
 
-    const requestId = params.id;
+    const { id: requestId } = await params;
 
     // Get current user
     const currentUser = await prisma.user.findUnique({
@@ -96,7 +96,7 @@ export async function GET(
 // PATCH - Update swap request status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession();
@@ -108,7 +108,7 @@ export async function PATCH(
       );
     }
 
-    const requestId = params.id;
+    const { id: requestId } = await params;
     const body = await request.json();
     const { status, message } = body;
 
@@ -235,7 +235,7 @@ export async function PATCH(
 // DELETE - Delete a swap request (only sender can delete pending requests)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession();
@@ -247,7 +247,7 @@ export async function DELETE(
       );
     }
 
-    const requestId = params.id;
+    const { id: requestId } = await params;
 
     // Get current user
     const currentUser = await prisma.user.findUnique({
