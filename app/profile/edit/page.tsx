@@ -9,7 +9,7 @@ import Link from "next/link";
 import { ArrowLeft, User } from "lucide-react";
 
 export default function ProfileEditPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +128,11 @@ export default function ProfileEditPage() {
         </div>
       </div>
     );
+  }
+
+  // Redirect if not authenticated
+  if (status === "unauthenticated") {
+    return null; // The useEffect will handle the redirect
   }
 
   return (

@@ -1,8 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+
+interface SessionUser {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+
+interface SessionWithUser {
+  user?: SessionUser;
+}
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,14 +80,14 @@ export function MessageThread({ swapRequest, isOpen, onClose }: MessageThreadPro
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const currentUserId = session?.user?.id;
-  const otherUser = swapRequest.senderId === currentUserId ? swapRequest.receiver : swapRequest.sender;
+  const currentUserId = (session as SessionWithUser)?.user?.id;
+  const otherUser = swapRequest.sender.id === currentUserId ? swapRequest.receiver : swapRequest.sender;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/messages?swapRequestId=${swapRequest.id}`);
@@ -93,7 +104,7 @@ export function MessageThread({ swapRequest, isOpen, onClose }: MessageThreadPro
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [swapRequest.id]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,7 +170,7 @@ export function MessageThread({ swapRequest, isOpen, onClose }: MessageThreadPro
     if (isOpen) {
       fetchMessages();
     }
-  }, [isOpen, swapRequest.id]);
+  }, [isOpen, fetchMessages]);
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Star, User, Calendar, MessageSquare } from "lucide-react";
 
@@ -44,7 +44,7 @@ export function ReviewsList({
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
-  const fetchReviews = async (page = 1) => {
+  const fetchReviews = useCallback(async (page = 1) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -81,11 +81,11 @@ export function ReviewsList({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId, type, limit]);
 
   useEffect(() => {
     fetchReviews();
-  }, [userId, type]);
+  }, [fetchReviews]);
 
   const renderStars = (rating: number, size = "w-4 h-4") => {
     return Array.from({ length: 5 }, (_, index) => (

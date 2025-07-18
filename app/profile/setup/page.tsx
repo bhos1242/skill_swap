@@ -80,7 +80,7 @@ export default function ProfileSetupPage() {
               Welcome to Skill Swap, {session?.user?.name}! 
             </p>
             <p className="text-gray-600">
-              Let's set up your profile so you can start connecting with other learners and teachers.
+              Let&apos;s set up your profile so you can start connecting with other learners and teachers.
             </p>
           </div>
         </div>

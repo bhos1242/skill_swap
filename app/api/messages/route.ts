@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify user is part of this swap request
-    const swapRequest = await (prisma as any).swapRequest.findUnique({
+    const swapRequest = await prisma.swapRequest.findUnique({
       where: { id: swapRequestId }
     });
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch messages
     const [messages, totalCount] = await Promise.all([
-      (prisma as any).message.findMany({
+      (prisma as unknown as { message: { findMany: (args: Record<string, unknown>) => Promise<unknown[]> } }).message.findMany({
         where: { swapRequestId },
         include: {
           sender: {
@@ -79,13 +79,13 @@ export async function GET(request: NextRequest) {
         skip: offset,
         take: limit
       }),
-      (prisma as any).message.count({
+      (prisma as unknown as { message: { count: (args: Record<string, unknown>) => Promise<number> } }).message.count({
         where: { swapRequestId }
       })
     ]);
 
     // Mark messages as read for current user
-    await (prisma as any).message.updateMany({
+    await (prisma as unknown as { message: { updateMany: (args: Record<string, unknown>) => Promise<unknown> } }).message.updateMany({
       where: {
         swapRequestId,
         senderId: { not: currentUser.id },
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user is part of this swap request
-    const swapRequest = await (prisma as any).swapRequest.findUnique({
+    const swapRequest = await prisma.swapRequest.findUnique({
       where: { id: swapRequestId }
     });
 
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the message
-    const message = await (prisma as any).message.create({
+    const message = await (prisma as unknown as { message: { create: (args: Record<string, unknown>) => Promise<unknown> } }).message.create({
       data: {
         swapRequestId,
         senderId: currentUser.id,

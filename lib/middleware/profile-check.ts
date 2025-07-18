@@ -1,11 +1,18 @@
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function checkProfileCompletion(email: string): Promise<{
   isComplete: boolean;
-  user?: any;
+  user?: {
+    id: string;
+    email: string;
+    profileCompleted: boolean;
+    name?: string | null;
+    skillsOffered?: string[];
+    skillsWanted?: string[];
+  };
 }> {
   try {
     const user = await prisma.user.findUnique({

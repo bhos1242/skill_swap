@@ -16,14 +16,9 @@ import {
 } from "@/components/ui/dialog";
 import {
   Calendar,
-  Clock,
   Video,
   Phone,
-  MapPin,
-  Users,
-  Plus,
-  X,
-  CheckCircle
+  MapPin
 } from "lucide-react";
 
 interface ScheduleMeetingProps {
@@ -34,12 +29,6 @@ interface ScheduleMeetingProps {
   isOpen: boolean;
   onClose: () => void;
   onScheduled?: () => void;
-}
-
-interface TimeSlot {
-  date: string;
-  time: string;
-  available: boolean;
 }
 
 export function ScheduleMeeting({
@@ -100,15 +89,6 @@ export function ScheduleMeeting({
 
     try {
       // Create meeting proposal message
-      const meetingDetails = {
-        date: selectedDate,
-        time: selectedTime,
-        type: meetingType,
-        duration: parseInt(duration),
-        location: meetingType === "in-person" ? location : undefined,
-        notes: notes.trim() || undefined
-      };
-
       const meetingMessage = `📅 **Meeting Proposal**
 
 **Skill Exchange:** ${skillOffered} ↔ ${skillWanted}

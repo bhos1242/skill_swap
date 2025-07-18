@@ -23,7 +23,7 @@ export function Footer() {
               in exchange for learning skills they need.
             </p>
             <p className="text-sm text-gray-500">
-              © 2024 Skill Swap. All rights reserved.
+              © {new Date().getFullYear()} Skill Swap. All rights reserved.
             </p>
           </div>
 

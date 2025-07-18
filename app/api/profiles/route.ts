@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "12");
     const offset = (page - 1) * limit;
 
-    // Build where clause for filtering - using any to handle type issues
-    const whereClause: any = {
+    // Build where clause for filtering
+    const whereClause: Record<string, unknown> = {
       email: {
         not: session.user.email
       }
@@ -53,14 +53,14 @@ export async function GET(request: NextRequest) {
         },
         skip: offset,
         take: limit
-      }) as unknown as any[],
+      }),
       prisma.user.count({
         where: whereClause
       })
     ]);
 
     // Add default values for missing fields and ensure Google image is included
-    const profilesWithDefaults = profiles.map((profile: any) => ({
+    const profilesWithDefaults = profiles.map((profile) => ({
       id: profile.id,
       name: profile.name || "Unknown User",
       image: profile.image, // Keep Google profile image
@@ -70,14 +70,7 @@ export async function GET(request: NextRequest) {
       skillsWanted: profile.skillsWanted || [],
       bio: profile.bio || null,
       timezone: profile.timezone || "America/New_York",
-      availability: profile.availability || {
-        weekdays: false,
-        weekends: false,
-        mornings: false,
-        afternoons: false,
-        evenings: false,
-        flexible: false
-      },
+      availabilityData: profile.availabilityData || null,
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt,
       averageRating: 0, // Default rating

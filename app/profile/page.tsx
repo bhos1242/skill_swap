@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -47,7 +47,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -57,7 +57,67 @@ export default function ProfilePage() {
   // Check for update success message
   const updated = searchParams.get("updated");
 
-  // Redirect to sign-in if not authenticated
+  // Memoized function to fetch profile data
+  const fetchProfile = useCallback(async () => {
+    if (status !== "authenticated") return;
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await fetch("/api/profile/setup");
+    
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile");
+      }
+
+      const data = await response.json();
+      setProfile(data.user);
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+      setError(err instanceof Error ? err.message : "Failed to load profile");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [status]);
+
+  // Fetch profile data
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
+
+  // Handle redirect for unauthenticated users
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/sign-in");
+    }
+  }, [status, router]);
+
+  // Memoized availability formatter
+  const formatAvailability = useMemo(() => {
+    return (availability?: UserProfile['availability']) => {
+      if (!availability) return "Not specified";
+
+      const days = [];
+      if (availability.weekdays) days.push("Weekdays");
+      if (availability.weekends) days.push("Weekends");
+
+      const times = [];
+      if (availability.mornings) times.push("Mornings");
+      if (availability.afternoons) times.push("Afternoons");
+      if (availability.evenings) times.push("Evenings");
+      if (availability.flexible) times.push("Flexible");
+
+      const dayStr = days.length > 0 ? days.join(", ") : "";
+      const timeStr = times.length > 0 ? times.join(", ") : "";
+
+      if (dayStr && timeStr) return `${dayStr} - ${timeStr}`;
+      if (dayStr) return dayStr;
+      if (timeStr) return timeStr;
+      return "Not specified";
+    };
+  }, []);
+
+  // Early returns for different states
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50 flex items-center justify-center">
@@ -70,62 +130,10 @@ export default function ProfilePage() {
   }
 
   if (status === "unauthenticated") {
-    router.push("/sign-in");
-    return null;
+    return null; // The useEffect will handle the redirect
   }
 
-  // Fetch profile data
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch("/api/profile/setup");
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile");
-        }
-
-        const data = await response.json();
-        console.log("Profile data received:", data.user); // Debug log
-        console.log("Profile availability:", data.user.availability); // Debug log
-        setProfile(data.user);
-      } catch (err) {
-        console.error("Profile fetch error:", err);
-        setError(err instanceof Error ? err.message : "Failed to load profile");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (session?.user?.email) {
-      fetchProfile();
-    }
-  }, [session]);
-
-  const formatAvailability = (availability?: UserProfile['availability']) => {
-    console.log("Formatting availability:", availability); // Debug log
-
-    if (!availability) return "Not specified";
-
-    const days = [];
-    if (availability.weekdays) days.push("Weekdays");
-    if (availability.weekends) days.push("Weekends");
-
-    const times = [];
-    if (availability.mornings) times.push("Mornings");
-    if (availability.afternoons) times.push("Afternoons");
-    if (availability.evenings) times.push("Evenings");
-    if (availability.flexible) times.push("Flexible");
-
-    const dayStr = days.length > 0 ? days.join(", ") : "";
-    const timeStr = times.length > 0 ? times.join(", ") : "";
-
-    if (dayStr && timeStr) return `${dayStr} - ${timeStr}`;
-    if (dayStr) return dayStr;
-    if (timeStr) return timeStr;
-    return "Not specified";
-  };
-
+  // Show loading state for profile data
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50 flex items-center justify-center">
@@ -160,7 +168,7 @@ export default function ProfilePage() {
         <div className="text-center max-w-md mx-auto">
           <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile Not Found</h2>
-          <p className="text-gray-600 mb-4">It looks like you haven&rsquo;t completed your profile setup yet.</p>
+          <p className="text-gray-600 mb-4">It looks like you haven&apos;t completed your profile setup yet.</p>
           <Button asChild>
             <Link href="/profile/setup">
               Complete Profile Setup

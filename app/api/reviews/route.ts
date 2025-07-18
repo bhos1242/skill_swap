@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch reviews with user details
     const [reviews, totalCount] = await Promise.all([
-      (prisma as any).review.findMany({
+      prisma.review.findMany({
         where: whereClause,
         include: {
           giver: {
@@ -54,13 +54,13 @@ export async function GET(request: NextRequest) {
         skip: offset,
         take: limit
       }),
-      (prisma as any).review.count({
+      prisma.review.count({
         where: whereClause
       })
     ]);
 
     // Calculate average rating for received reviews
-    const avgRating = await (prisma as any).review.aggregate({
+    const avgRating = await prisma.review.aggregate({
       where: { receiverId: userId },
       _avg: {
         rating: true
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
 
     // Check if review already exists for this swap
     if (swapId) {
-      const existingReview = await (prisma as any).review.findFirst({
+      const existingReview = await prisma.review.findFirst({
         where: {
           giverId: currentUser.id,
           receiverId: receiverId,
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify that a completed swap exists between these users
-    const completedSwap = await (prisma as any).swapRequest.findFirst({
+    const completedSwap = await prisma.swapRequest.findFirst({
       where: {
         OR: [
           { senderId: currentUser.id, receiverId: receiverId },
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the review
-    const review = await (prisma as any).review.create({
+    const review = await prisma.review.create({
       data: {
         giverId: currentUser.id,
         receiverId: receiverId,

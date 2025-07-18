@@ -30,7 +30,7 @@ export function SkillSelector({
   const filteredSkills = allSkills.filter(skill => {
     const matchesSearch = skill.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "All" || 
-      SKILL_CATEGORIES[selectedCategory as SkillCategory]?.includes(skill as any);
+      (SKILL_CATEGORIES[selectedCategory as SkillCategory] as readonly string[])?.includes(skill);
     const notAlreadySelected = !selectedSkills.includes(skill);
     
     return matchesSearch && matchesCategory && notAlreadySelected;

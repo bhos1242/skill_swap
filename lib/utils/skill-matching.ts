@@ -123,8 +123,8 @@ export function calculateLocationMatch(
   const otherLocation = otherUserLocation.toLowerCase().trim();
 
   return currentLocation === otherLocation ||
-         currentLocation.includes(otherLocation) ||
-         otherLocation.includes(currentLocation);
+    currentLocation.includes(otherLocation) ||
+    otherLocation.includes(currentLocation);
 }
 
 /**
@@ -159,7 +159,7 @@ export function calculateOverallMatch(
   const availabilityWeight = 0.3; // 30% - important for scheduling
   const locationWeight = 0.1;    // 10% - nice to have
 
-  const overallScore = 
+  const overallScore =
     (skillMatch.compatibilityScore * skillWeight) +
     (availabilityMatch * availabilityWeight) +
     (locationMatch ? 100 * locationWeight : 0);

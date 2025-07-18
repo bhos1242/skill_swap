@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
-import { ProfileSetupFormData, ProfileVisibility } from "@/lib/types/profile";
+import { ProfileSetupFormData } from "@/lib/types/profile";
 
 const prisma = new PrismaClient();
 
@@ -71,13 +71,13 @@ export async function PUT(request: NextRequest) {
         ...(body.availability && {
           availabilityData: JSON.stringify(body.availability)
         }),
-      } as any
+      }
     });
 
     // Availability is now stored in the user record as JSON
 
-    // Cast updatedUser to any to handle type issues
-    const userWithProfile = updatedUser as any;
+    // Return updated user profile
+    const userWithProfile = updatedUser;
 
     // Parse availability from JSON
     let availability = null;

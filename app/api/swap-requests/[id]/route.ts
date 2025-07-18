@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -34,7 +34,7 @@ export async function GET(
     }
 
     // Fetch the swap request
-    const swapRequest = await (prisma as any).swapRequest.findUnique({
+    const swapRequest = await prisma.swapRequest.findUnique({
       where: { id: requestId },
       include: {
         sender: {
@@ -134,7 +134,7 @@ export async function PATCH(
     }
 
     // Fetch the swap request
-    const swapRequest = await (prisma as any).swapRequest.findUnique({
+    const swapRequest = await prisma.swapRequest.findUnique({
       where: { id: requestId }
     });
 
@@ -185,7 +185,7 @@ export async function PATCH(
     }
 
     // Update the request
-    const updatedRequest = await (prisma as any).swapRequest.update({
+    const updatedRequest = await prisma.swapRequest.update({
       where: { id: requestId },
       data: {
         status: status,
@@ -262,7 +262,7 @@ export async function DELETE(
     }
 
     // Fetch the swap request
-    const swapRequest = await (prisma as any).swapRequest.findUnique({
+    const swapRequest = await prisma.swapRequest.findUnique({
       where: { id: requestId }
     });
 
@@ -289,7 +289,7 @@ export async function DELETE(
     }
 
     // Delete the request
-    await (prisma as any).swapRequest.delete({
+    await prisma.swapRequest.delete({
       where: { id: requestId }
     });
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 import { 
   filterUsers, 
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Get current user's profile for matching
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user.email }
-    }) as any;
+    });
 
     if (!currentUser) {
       return NextResponse.json(
@@ -64,10 +64,10 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: "desc"
       }
-    }) as any[];
+    });
 
     // Transform users to match the expected format
-    const transformedUsers: MatchingUserProfile[] = allUsers.map((user: any) => {
+    const transformedUsers: MatchingUserProfile[] = allUsers.map((user) => {
       let availability = null;
       try {
         if (user.availabilityData) {
@@ -80,12 +80,12 @@ export async function GET(request: NextRequest) {
       return {
         id: user.id,
         name: user.name || "Unknown User",
-        image: user.image || null,
-        location: user.location || null,
+        image: user.image || undefined,
+        location: user.location || undefined,
         skillsOffered: user.skillsOffered || [],
         skillsWanted: user.skillsWanted || [],
-        bio: user.bio || null,
-        timezone: user.timezone || null,
+        bio: user.bio || undefined,
+        timezone: user.timezone || undefined,
         availability: availability || {
           weekdays: false,
           weekends: false,
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
       const currentUserProfile = {
         skillsOffered: currentUser.skillsOffered || [],
         skillsWanted: currentUser.skillsWanted || [],
-        location: currentUser.location,
+        location: currentUser.location || undefined,
         availability: currentUserAvailability
       };
       

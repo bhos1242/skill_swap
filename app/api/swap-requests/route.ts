@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build where clause
-    let whereClause: any = {};
+    const whereClause: Record<string, unknown> = {};
 
     if (type === "sent") {
       whereClause.senderId = currentUser.id;
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch requests with user details
     const [requests, totalCount] = await Promise.all([
-      (prisma as any).swapRequest.findMany({
+      prisma.swapRequest.findMany({
         where: whereClause,
         include: {
           sender: {
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
         skip: offset,
         take: limit
       }),
-      (prisma as any).swapRequest.count({
+      prisma.swapRequest.count({
         where: whereClause
       })
     ]);
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing pending request between these users for the same skills
-    const existingRequest = await (prisma as any).swapRequest.findFirst({
+    const existingRequest = await prisma.swapRequest.findFirst({
       where: {
         senderId: currentUser.id,
         receiverId: receiverId,
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the swap request
-    const swapRequest = await (prisma as any).swapRequest.create({
+    const swapRequest = await prisma.swapRequest.create({
       data: {
         senderId: currentUser.id,
         receiverId: receiverId,

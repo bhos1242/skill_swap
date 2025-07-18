@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { UserProfile } from "@/lib/types/profile";
@@ -20,7 +20,7 @@ export function useProfile(): UseProfileReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!session?.user?.email) {
       setIsLoading(false);
       return;
@@ -55,7 +55,7 @@ export function useProfile(): UseProfileReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session?.user?.email, router]);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -63,7 +63,7 @@ export function useProfile(): UseProfileReturn {
     } else if (status === "unauthenticated") {
       setIsLoading(false);
     }
-  }, [session, status]);
+  }, [status, fetchProfile]);
 
   const isProfileComplete = profile?.profileCompleted || false;
 

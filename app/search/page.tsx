@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -95,7 +95,7 @@ export default function SearchPage() {
   // Request modal state
   const [showRequestModal, setShowRequestModal] = useState<UserProfile | null>(null);
 
-  const fetchProfiles = async (page = currentPage) => {
+  const fetchProfiles = useCallback(async (page = currentPage) => {
     setIsLoading(true);
     setError(null);
 
@@ -145,7 +145,17 @@ export default function SearchPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [
+    currentPage,
+    sortBy,
+    searchTerm,
+    locationFilter,
+    skillsOfferedFilter,
+    skillsWantedFilter,
+    minRatingFilter,
+    availabilityDaysFilter,
+    availabilityTimesFilter
+  ]);
 
   // Helper functions for filter management
   const addSkillOffered = () => {
@@ -170,22 +180,6 @@ export default function SearchPage() {
     setSkillsWantedFilter(skillsWantedFilter.filter(s => s !== skill));
   };
 
-  const toggleAvailabilityDay = (day: string) => {
-    setAvailabilityDaysFilter(prev =>
-      prev.includes(day)
-        ? prev.filter(d => d !== day)
-        : [...prev, day]
-    );
-  };
-
-  const toggleAvailabilityTime = (time: string) => {
-    setAvailabilityTimesFilter(prev =>
-      prev.includes(time)
-        ? prev.filter(t => t !== time)
-        : [...prev, time]
-    );
-  };
-
   const clearAllFilters = () => {
     setSearchTerm("");
     setLocationFilter("");
@@ -204,7 +198,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     fetchProfiles();
-  }, [currentPage, sortBy]);
+  }, [fetchProfiles]);
 
   const formatAvailability = (availability?: UserProfile['availability']) => {
     if (!availability) return "Not specified";

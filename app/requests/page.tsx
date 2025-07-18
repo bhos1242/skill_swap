@@ -1,10 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+
+interface SessionUser {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+
+interface SessionWithUser {
+  user?: SessionUser;
+}
 import {
   User,
   Clock,
@@ -79,24 +90,7 @@ export default function RequestsPage() {
   const [showMessageThread, setShowMessageThread] = useState<string | null>(null);
   const [showScheduleMeeting, setShowScheduleMeeting] = useState<string | null>(null);
 
-  // Redirect if not authenticated
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === "unauthenticated") {
-    router.push("/sign-in");
-    return null;
-  }
-
-  const fetchRequests = async (page = 1) => {
+  const fetchRequests = useCallback(async (page = 1) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -118,14 +112,44 @@ export default function RequestsPage() {
       setRequests(data.requests);
       setPagination(data.pagination);
       setCurrentPage(page);
-
     } catch (err) {
       console.error("Fetch requests error:", err);
       setError(err instanceof Error ? err.message : "Failed to load requests");
+      setRequests([]);
+      setPagination(null);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeTab, statusFilter]);
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.email) {
+      fetchRequests();
+    }
+  }, [status, session?.user?.email, activeTab, statusFilter, fetchRequests]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/sign-in");
+    }
+  }, [status, router]);
+
+  // Redirect if not authenticated
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    router.push("/sign-in");
+    return null;
+  }
 
   const handleStatusUpdate = async (requestId: string, newStatus: string) => {
     try {
@@ -149,12 +173,6 @@ export default function RequestsPage() {
       setError(err instanceof Error ? err.message : "Failed to update request");
     }
   };
-
-  useEffect(() => {
-    if (session?.user?.email) {
-      fetchRequests();
-    }
-  }, [session, activeTab, statusFilter]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -191,16 +209,16 @@ export default function RequestsPage() {
   };
 
   const canAcceptReject = (request: SwapRequest) => {
-    return request.status === "PENDING" && request.receiverId === session?.user?.id;
+    return request.status === "PENDING" && request.receiverId === (session as SessionWithUser)?.user?.id;
   };
 
   const canComplete = (request: SwapRequest) => {
     return request.status === "ACCEPTED" && 
-           (request.senderId === session?.user?.id || request.receiverId === session?.user?.id);
+           (request.senderId === (session as SessionWithUser)?.user?.id || request.receiverId === (session as SessionWithUser)?.user?.id);
   };
 
   const canCancel = (request: SwapRequest) => {
-    return request.status === "PENDING" && request.senderId === session?.user?.id;
+    return request.status === "PENDING" && request.senderId === (session as SessionWithUser)?.user?.id;
   };
 
   const canReview = (request: SwapRequest) => {
@@ -221,7 +239,7 @@ export default function RequestsPage() {
     const request = requests.find(r => r.id === showReviewForm);
     if (!request) return;
 
-    const isReceived = request.receiverId === session?.user?.id;
+    const isReceived = request.receiverId === (session as SessionWithUser)?.user?.id;
     const otherUser = isReceived ? request.sender : request.receiver;
 
     try {
@@ -374,7 +392,7 @@ export default function RequestsPage() {
             ) : (
               <div className="space-y-4">
                 {requests.map((request) => {
-                  const isReceived = request.receiverId === session?.user?.id;
+                  const isReceived = request.receiverId === (session as SessionWithUser)?.user?.id;
                   const otherUser = isReceived ? request.sender : request.receiver;
                   
                   return (
@@ -585,7 +603,7 @@ export default function RequestsPage() {
             const request = requests.find(r => r.id === showScheduleMeeting);
             if (!request) return null;
 
-            const isReceived = request.receiverId === session?.user?.id;
+            const isReceived = request.receiverId === (session as SessionWithUser)?.user?.id;
             const otherUser = isReceived ? request.sender : request.receiver;
 
             return (
@@ -611,7 +629,7 @@ export default function RequestsPage() {
             const request = requests.find(r => r.id === showReviewForm);
             if (!request) return null;
 
-            const isReceived = request.receiverId === session?.user?.id;
+            const isReceived = request.receiverId === (session as SessionWithUser)?.user?.id;
             const otherUser = isReceived ? request.sender : request.receiver;
 
             return (

@@ -209,10 +209,10 @@ export default function Home() {
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-sky-600 font-semibold">JS</span>
+                    <span className="text-sky-600 font-semibold">AS</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">John Smith</div>
+                    <div className="font-semibold text-gray-900">Amit Sharma</div>
                     <div className="text-sm text-gray-500">Web Developer</div>
                   </div>
                 </div>
@@ -232,10 +232,10 @@ export default function Home() {
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-sky-600 font-semibold">AL</span>
+                    <span className="text-sky-600 font-semibold">PP</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Anna Lee</div>
+                    <div className="font-semibold text-gray-900">Priya Patel</div>
                     <div className="text-sm text-gray-500">Chef</div>
                   </div>
                 </div>
@@ -255,10 +255,10 @@ export default function Home() {
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-sky-600 font-semibold">MR</span>
+                    <span className="text-sky-600 font-semibold">RV</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Mike Rodriguez</div>
+                    <div className="font-semibold text-gray-900">Rahul Verma</div>
                     <div className="text-sm text-gray-500">Designer</div>
                   </div>
                 </div>

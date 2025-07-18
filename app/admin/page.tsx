@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
     }
   }, [status, session, router]);
 
-  const fetchUsers = async (page = 1) => {
+  const fetchUsers = useCallback(async (page = 1) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [searchTerm, statusFilter]);
 
   const handleUserAction = async (action: "suspend" | "unsuspend" | "delete") => {
     if (!actionDialog.user) return;
@@ -163,7 +163,7 @@ export default function AdminDashboard() {
     if (session?.user?.email) {
       fetchUsers();
     }
-  }, [session, searchTerm, statusFilter]);
+  }, [session, fetchUsers]);
 
   if (status === "loading") {
     return (

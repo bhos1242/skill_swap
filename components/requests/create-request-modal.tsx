@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,8 +17,7 @@ import {
 import {
   Send,
   ArrowRightLeft,
-  User,
-  X
+  User
 } from "lucide-react";
 
 interface CreateRequestModalProps {
@@ -116,9 +116,11 @@ export function CreateRequestModal({
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
             <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center">
               {targetUser.image ? (
-                <img
+                <Image
                   src={targetUser.image}
                   alt={targetUser.name}
+                  width={40}
+                  height={40}
                   className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (

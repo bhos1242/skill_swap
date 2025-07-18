@@ -36,6 +36,7 @@ model User {
   receivedRequests  SwapRequest[]       @relation("RequestReceiver")
   givenReviews      Review[]            @relation("ReviewGiver")
   receivedReviews   Review[]            @relation("ReviewReceiver")
+  sentMessages      Message[]           @relation("MessageSender")
 }
 
 model UserAvailability {
@@ -62,8 +63,22 @@ model SwapRequest {
   message     String?
   skillOffered String
   skillWanted  String
+  messages    Message[]         @relation("SwapRequestMessages")
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
+}
+
+model Message {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  content       String
+  messageType   MessageType @default(TEXT)
+  swapRequestId String      @db.ObjectId
+  senderId      String      @db.ObjectId
+  swapRequest   SwapRequest @relation("SwapRequestMessages", fields: [swapRequestId], references: [id], onDelete: Cascade)
+  sender        User        @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  readAt        DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model Review {
@@ -90,4 +105,10 @@ enum SwapRequestStatus {
   REJECTED
   COMPLETED
   CANCELLED
+}
+
+enum MessageType {
+  TEXT
+  SYSTEM
+  SCHEDULING
 }

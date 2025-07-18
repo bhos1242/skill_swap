@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
-import { ProfileSetupFormData, ProfileVisibility } from "@/lib/types/profile";
+import { ProfileSetupFormData } from "@/lib/types/profile";
 
 const prisma = new PrismaClient();
 
@@ -55,11 +55,11 @@ export async function POST(request: NextRequest) {
         data: {
           email: session.user.email,
           name: session.user.name || ""
-        } as any
+        }
       });
     }
 
-    // Update user profile - using any type to handle Prisma type issues
+    // Update user profile
     const updatedUser = await prisma.user.update({
       where: { email: session.user.email },
       data: {
@@ -75,14 +75,14 @@ export async function POST(request: NextRequest) {
         ...(body.availability && {
           availabilityData: JSON.stringify(body.availability)
         }),
-      } as any
+      }
     });
 
     // Handle availability separately if the relation exists
     if (body.availability) {
       try {
         // Try to create/update availability record
-        const availabilityModel = (prisma as any).userAvailability;
+        const availabilityModel = prisma.userAvailability;
         if (availabilityModel) {
           await availabilityModel.upsert({
             where: { userId: updatedUser.id },
@@ -110,8 +110,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Cast updatedUser to any to handle type issues
-    const userWithProfile = updatedUser as any;
+    // Return profile data
+    const userWithProfile = updatedUser;
 
     return NextResponse.json({
       message: "Profile updated successfully",
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
         profileCompleted: true,
         bio: userWithProfile.bio || null,
         timezone: userWithProfile.timezone || "America/New_York",
-        availability: userWithProfile.availability || null,
+        availability: userWithProfile.availabilityData ? JSON.parse(userWithProfile.availabilityData) : null,
         createdAt: userWithProfile.createdAt,
         updatedAt: userWithProfile.updatedAt
       }
@@ -157,7 +157,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
-    }) as any;
+    });
 
     if (!user) {
       return NextResponse.json(

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight, Check, User, BookOpen, Clock, Eye } from "lucide-react";
 import { ProfileSetupFormData, ProfileVisibility, COMMON_TIMEZONES } from "@/lib/types/profile";

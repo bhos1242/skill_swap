@@ -13,9 +13,7 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({
-  receiverId,
   receiverName,
-  swapId,
   onSubmit,
   onCancel,
   isLoading = false

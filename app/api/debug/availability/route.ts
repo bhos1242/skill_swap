@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -32,14 +32,9 @@ export async function GET() {
     let availabilityError = null;
 
     try {
-      const availabilityModel = (prisma as any).userAvailability;
-      if (availabilityModel) {
-        availability = await availabilityModel.findUnique({
-          where: { userId: user.id }
-        });
-      } else {
-        availabilityError = "UserAvailability model not found";
-      }
+      availability = await prisma.userAvailability.findUnique({
+        where: { userId: user.id }
+      });
     } catch (error) {
       availabilityError = error instanceof Error ? error.message : "Unknown error";
     }
@@ -47,10 +42,7 @@ export async function GET() {
     // Get all availability records for debugging
     let allAvailability = [];
     try {
-      const availabilityModel = (prisma as any).userAvailability;
-      if (availabilityModel) {
-        allAvailability = await availabilityModel.findMany();
-      }
+      allAvailability = await prisma.userAvailability.findMany();
     } catch (error) {
       console.log("Error fetching all availability:", error);
     }
@@ -65,7 +57,7 @@ export async function GET() {
       availabilityError,
       allAvailabilityRecords: allAvailability.length,
       debug: {
-        userAvailabilityModelExists: !!(prisma as any).userAvailability,
+        userAvailabilityModelExists: !!prisma.userAvailability,
         prismaModels: Object.keys(prisma).filter(key => !key.startsWith('$'))
       }
     });
