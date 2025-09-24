@@ -1,7 +1,19 @@
 {
   "name": "skill_swap",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "description": "A modern, community-driven skill-sharing platform enabling peer-to-peer learning through a barter-based model",
+  "keywords": ["skill-sharing", "education", "nextjs", "react", "typescript", "prisma", "mongodb"],
+  "author": "Vivek Bhos <bhosvivek123@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/bhos1242/skill_swap#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bhos1242/skill_swap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bhos1242/skill_swap/issues"
+  },
   "scripts": {
     "dev": "next dev --turbopack --port 8888",
     "build": "next build",
