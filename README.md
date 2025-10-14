@@ -463,4 +463,7 @@ This project is **private and proprietary**. Not for commercial redistribution.
 ### 🌐 *Skill Swap: Empowering communities, one exchange at a time.*
 
 **Exchange • Learn • Grow**
+Documentation
+[Skill Swap Platform — Project Documentation.pdf](https://github.com/user-attachments/files/22909199/Skill.Swap.Platform.Project.Documentation.pdf)
+https://docs.google.com/document/d/1iQLr9yB8__ZhVEHscBWrH8Hn_crExA4ycN6InT6RicM/edit?usp=sharing
 
